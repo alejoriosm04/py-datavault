@@ -1,6 +1,6 @@
 ## py-datavault
 
-### Project Structur
+### Project Structure
 
 ```
 py-datavault/
