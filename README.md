@@ -5,87 +5,97 @@ A secure, parallel backup system with compression, encryption, and cloud support
 ## Setup
 
 ### 1. Dependencies
-This project relies on the `PyDrive2` library. You can install it via pip:
+This project relies on several Python libraries. You can install them via pip using the `requirements.txt` file:
+
 ```bash
-pip install PyDrive2
+pip install -r requirements.txt
 ```
 
-### 2. Authentication
-To allow the application to access your Google Drive, you need to provide authentication credentials.
+Make sure you have `click` and `PyDrive2` among other dependencies listed in `requirements.txt`.
 
-*   **`mycreds.txt`**: This file stores your Google Drive API credentials.
-    *   You should have received a `mycreds.txt` file.
-    *   Place this file inside a directory named `secrets` at the root of the project. The path should be: `secrets/mycreds.txt`.
-    *   **Important**: If `mycreds.txt` is not found or the credentials expire, the script will attempt to open a web browser for you to authenticate with your Google Account. Follow the on-screen instructions. After successful authentication, `mycreds.txt` will be created or updated in the `secrets/` directory.
+### 2. Authentication (for Cloud Backups)
+To allow the application to access your Google Drive for cloud backups, you need to provide authentication credentials.
 
-**Directory Structure for Credentials:**
+*   **`secrets/mycreds.txt`**: This file stores your Google Drive API credentials.
+    *   The first time you attempt a cloud upload, the script will attempt to open a web browser for you to authenticate with your Google Account. Follow the on-screen instructions.
+    *   After successful authentication, `mycreds.txt` will be created or updated in the `secrets/` directory.
+    *   **Important**: Ensure the `secrets` directory exists at the root of your project.
+
+**Recommended Directory Structure:**
 ```
 py-datavault/
+├── interface/
+│   └── cli.py
 ├── secrets/
 │   └── mycreds.txt
 ├── storage/
-│   └── cloud.py
-└── main.py
+│   ├── cloud.py
+│   ├── uploader.py
+│   └── local.py
+├── main.py
+└── README.md
+└── requirements.txt
 ```
 
 ## Usage
 
-### 1. Preparing Files for Backup
-Place the files you want to back up in any location accessible by your system. For organizational purposes, you might want to create a dedicated `backups/` directory within the project, but this is not mandatory.
+This project uses a command-line interface (CLI) to manage backups. You will interact with it via `main.py`.
 
-Example:
-```
-py-datavault/
-├── backups/
-│   └── my_important_document.txt
-│   └── hola2.txt
-├── secrets/
-│   └── mycreds.txt
-├── storage/
-│   └── cloud.py
-└── main.py
-```
+### General Commands
 
-### 2. Configuring `main.py`
-The `main.py` script is where you specify which file to upload.
+*   **Help**: To see all available commands and their options:
+    ```bash
+    python main.py --help
+    ```
 
-Open `main.py` and modify the `ruta` variable to point to the local file you wish to upload.
+### 1. Backing Up to the Cloud (Google Drive)
 
-```python
-from storage.cloud import upload_backup
+*   **Command**: `upload-cloud`
+*   **Description**: Uploads a specified backup file to your Google Drive.
+*   **Usage**:
+    ```bash
+    python main.py upload-cloud
+    ```
+    The CLI will prompt you for the path to the backup file.
+    Alternatively, you can provide the path directly using the `--ruta` option:
+    ```bash
+    python main.py upload-cloud --ruta path/to/your/backupfile.zip
+    ```
 
-if __name__ == "__main__":
-    # Modify this path to your target file
-    ruta = "backups/hola2.txt"
-    upload_backup(ruta) # Uploads with the same filename as the local file
+### 2. Copying Backup to an External Drive
 
-    # To specify a different name on Google Drive:
-    # upload_backup(ruta, filename_on_drive="my_backup_on_drive.txt")
-```
-
-### 3. Running the Script
-Execute the `main.py` script from your terminal:
-```bash
-python main.py
-```
-Upon successful execution, you will see a confirmation message:
-`✅ Archivo '[your_local_file_path]' subido a Google Drive como '[filename_on_drive]'`
+*   **Command**: `copy-external`
+*   **Description**: Copies a specified backup file to a local directory (e.g., an external hard drive).
+*   **Usage**:
+    ```bash
+    python main.py copy-external
+    ```
+    The CLI will prompt you for the path to the backup file and the destination path on your external drive.
+    Alternatively, you can provide these paths directly:
+    ```bash
+    python main.py copy-external --ruta-backup path/to/your/backupfile.zip --ruta-destino /media/my_external_drive/backups/
+    ```
 
 ## Code Overview
 
-*   **`storage/cloud.py`**:
-    *   `authenticate()`: Handles the Google Drive authentication process. It loads credentials from `secrets/mycreds.txt`, refreshes them if expired, or initiates a new authentication flow if necessary.
-    *   `upload_backup(file_path: str, filename_on_drive: str = None)`:
-        *   Takes the `file_path` (local path to the file) as a mandatory argument.
-        *   Optionally, `filename_on_drive` can be provided to specify a different name for the file when it's saved on Google Drive. If not provided, the original filename is used.
-        *   Raises a `FileNotFoundError` if the `file_path` does not exist.
-        *   Authenticates using `authenticate()`, creates a new file on Google Drive, sets its content from the local file, and uploads it.
-
 *   **`main.py`**:
-    *   The main script to execute the backup process.
-    *   Imports `upload_backup` from `storage.cloud`.
-    *   Sets the `ruta` variable to the path of the file to be backed up.
-    *   Calls `upload_backup()` to upload the specified file.
+    *   The main entry point for the application. It imports and runs the CLI defined in `interface/cli.py`.
+
+*   **`interface/cli.py`**:
+    *   Defines the command-line interface structure using the `click` library.
+    *   Contains commands like `upload-cloud` and `copy-external`.
+    *   Handles user input, option parsing, and calls the appropriate functions from the `storage` module.
+
+*   **`storage/` (Directory)**: Contains modules responsible for different storage operations.
+    *   **`storage/cloud.py`**:
+        *   `authenticate()`: Handles the Google Drive authentication process. It loads credentials from `secrets/mycreds.txt`, refreshes them if expired, or initiates a new authentication flow if necessary. Ensures `access_type='offline'` for refresh tokens.
+    *   **`storage/uploader.py`**:
+        *   `upload_backup(file_path: str, filename_on_drive: str = None)`: Uploads a file to Google Drive. It uses `authenticate()` from `storage.cloud`. `filename_on_drive` is an optional parameter to specify a different name for the file on Google Drive.
+    *   **`storage/local.py`**:
+        *   `copy_to_local_drive(source_file_path: str, destination_directory_path: str)`: Copies a file from a source path to a local destination directory. Raises errors for invalid paths or other copy issues.
+
+*   **`secrets/` (Directory)**:
+    *   Intended to store sensitive information like `mycreds.txt` (Google Drive API credentials). This directory should be included in your `.gitignore` file if you are using version control.
 
 ---
 
