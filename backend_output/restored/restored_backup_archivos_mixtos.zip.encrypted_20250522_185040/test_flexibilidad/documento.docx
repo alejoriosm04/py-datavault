@@ -1,0 +1,10 @@
+[Simulando contenido binario de un documento DOCX]
+PKarchive_content_binary_placeholder
+Este archivo simula un documento de Word (.docx)
+para probar la flexibilidad del sistema de backup
+con diferentes tipos de archivos.
+
+El sistema debería poder comprimir cualquier tipo de archivo,
+incluyendo documentos de oficina, imágenes, videos, etc.
+
+Contenido binario simulado: 0x504B030414000600... 

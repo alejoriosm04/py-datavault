@@ -1,0 +1,43 @@
+{
+  "proyecto": "py-datavault",
+  "descripcion": "Sistema de Backup Seguro con Algoritmos de Compresión Clásicos",
+  "version": "1.0.0",
+  "tipos_archivos_soportados": {
+    "texto": [".txt", ".md", ".log", ".csv"],
+    "codigo": [".py", ".js", ".java", ".cpp", ".c", ".html", ".css", ".sql"],
+    "documentos": [".pdf", ".docx", ".xlsx", ".pptx", ".odt"],
+    "imagenes": [".jpg", ".jpeg", ".png", ".gif", ".svg", ".bmp", ".tiff"],
+    "audio": [".mp3", ".wav", ".flac", ".ogg", ".aac"],
+    "video": [".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv"],
+    "archivos": [".zip", ".rar", ".7z", ".tar", ".gz", ".bz2"],
+    "configuracion": [".json", ".xml", ".yaml", ".yml", ".ini", ".conf"],
+    "bases_datos": [".db", ".sqlite", ".sql", ".mdb", ".accdb"]
+  },
+  "algoritmos_compresion": {
+    "zip": {
+      "extension": ".zip",
+      "velocidad": "media",
+      "compresion": "buena",
+      "compatibilidad": "excelente"
+    },
+    "gzip": {
+      "extension": ".tar.gz", 
+      "velocidad": "rapida",
+      "compresion": "muy buena",
+      "compatibilidad": "excelente"
+    },
+    "bzip2": {
+      "extension": ".tar.bz2",
+      "velocidad": "lenta", 
+      "compresion": "excelente",
+      "compatibilidad": "buena"
+    }
+  },
+  "encriptacion": {
+    "algoritmo": "AES-256-CBC",
+    "derivacion_clave": "PBKDF2",
+    "iteraciones": 100000,
+    "seguridad": "alta"
+  },
+  "notas": "El sistema funciona con CUALQUIER tipo de archivo - es agnóstico al contenido"
+} 
