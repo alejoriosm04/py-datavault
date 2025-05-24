@@ -144,6 +144,56 @@ El sistema utiliza Dask para optimizar:
 - **Transferencia Optimizada**: Operaciones I/O paralelas
 - **Fragmentación Eficiente**: División y escritura simultánea
 
+## 📈 Métricas de Rendimiento y Análisis
+
+El sistema incluye un módulo personalizado de monitoreo de rendimiento (`performance_metrics.py`) que permite analizar y comparar operaciones secuenciales y paralelas en términos de:
+
+* **Duración total**
+* **Uso promedio y máximo de CPU**
+* **Uso promedio y máximo de memoria**
+* **Velocidad de transferencia (throughput)**
+* **Tasa de compresión**
+
+### 🧪 Script de Evaluación
+
+El script `test_simple.py` genera archivos de prueba y ejecuta dos tipos de compresión: secuencial y paralela. Durante cada operación, se registran métricas en tiempo real mediante la biblioteca `psutil`.
+
+Ejemplo de ejecución:
+
+```bash
+python test_simple.py
+```
+
+### 📊 Resultado de ejemplo
+
+```
+=== Estadísticas de rendimiento para compresión_secuencial ===
+Duración: 1.19 segundos
+Tasa de compresión: 50.00%
+CPU promedio: 1.8%
+CPU máximo: 1.8%
+Memoria promedio: 36.7 MB
+Memoria máxima: 36.7 MB
+Velocidad de transferencia: 0.00 MB/s
+
+=== Estadísticas de rendimiento para compresión_paralela ===
+Duración: 1.99 segundos
+Tasa de compresión: 50.00%
+CPU promedio: 13.2%
+CPU máximo: 13.2%
+Memoria promedio: 53.5 MB
+Memoria máxima: 53.5 MB
+Velocidad de transferencia: 0.00 MB/s
+
+=== Comparación de rendimiento ===
+Aceleración con paralelismo: 0.60x
+```
+
+### 📌 Análisis
+
+* **Paralelismo con Dask** permite mejorar el uso del CPU y distribuir la carga, aunque el tiempo total puede variar según el tamaño del archivo y la cantidad de núcleos disponibles.
+* El sistema demuestra cómo se comporta la compresión bajo distintos escenarios, lo cual es útil para decisiones sobre optimización de rendimiento en contextos reales.
+
 ## 🧪 Pruebas y Verificación
 
 El sistema incluye pruebas automatizadas para:
