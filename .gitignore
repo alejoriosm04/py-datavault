@@ -1,3 +1,6 @@
 secrets/
 venv/
 __pycache__/
+usb1/*
+usb2/*
+restaured/*
