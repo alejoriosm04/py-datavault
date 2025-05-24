@@ -3,6 +3,7 @@ import os
 from storage.uploader import upload_backup
 from storage.local import copy_to_local_drive
 from storage.splitter import split_and_save_parallel, restore_from_fragments
+from core.utils import BackupManager
 
 CONTEXT_SETTINGS = dict(help_option_names=['--help'], max_content_width=120)
 
@@ -88,7 +89,6 @@ def restaurar_usb(usb_paths):
     except Exception as e:
         click.secho(f"✗ Error al restaurar: {e}", fg="red")
 
-
 @cli.command()
 def test_fragmentar_restaurar():
     """Prueba completa con ZIP de ejemplo."""
@@ -106,3 +106,54 @@ def test_fragmentar_restaurar():
         click.secho(f"\n✓ Archivo restaurado en: {salida}", fg="green", bold=True)
     except Exception as e:
         click.secho(f"✗ Error durante la prueba: {e}", fg="red")
+
+@cli.command()
+@click.option('--folders', required=True, help='Comma-separated list of folders to backup.')
+@click.option('--backup-name', required=True, help='Name of the backup file.')
+@click.option('--compression', default='zip', help='Compression algorithm: zip, gzip, or bzip2.')
+@click.option('--encrypt', is_flag=True, help='Encrypt the backup.')
+@click.option('--password', default=None, help='Password for encryption.')
+@click.option('--usb-paths', required=True, help='Comma-separated USB paths for fragmentation.')
+@click.option('--cloud', is_flag=True, help='Upload to cloud after backup.')
+def full_backup_process(folders, backup_name, compression, encrypt, password, usb_paths, cloud):
+    """Execute a complete backup process including fragmentation and optional cloud upload."""
+    click.secho("╭───────── PROCESO COMPLETO DE BACKUP ─────────╮", fg="blue", bold=True)
+    
+    try:
+        # Create backup
+        click.echo("1. Creating backup...")
+        manager = BackupManager()
+        result = manager.create_backup(
+            folders=folders.split(','),
+            backup_name=backup_name,
+            compression_algorithm=compression,
+            encrypt=encrypt,
+            password=password
+        )
+        if not result['success']:
+            click.secho("✗ Backup creation failed.", fg="red")
+            return
+        click.secho("✓ Backup created successfully", fg="green")
+
+        # Fragment backup
+        click.echo("\n2. Fragmenting backup...")
+        split_and_save_parallel(result['backup_file'], 1, usb_paths.split(','))
+        click.secho("✓ Backup fragmented successfully", fg="green")
+
+        # Restore backup
+        click.echo("\n3. Restoring from fragments...")
+        restored_file = restore_from_fragments(usb_paths.split(','))
+        if restored_file:
+            click.secho(f"✓ Backup restored successfully to: {restored_file}", fg="green")
+
+        # Upload to cloud
+        if cloud:
+            click.echo("\n4. Uploading to cloud...")
+            upload_backup(result['backup_file'])
+            click.secho("✓ Backup uploaded to cloud successfully", fg="green")
+
+        click.secho("\n✓ Full backup process completed successfully.", fg="green", bold=True)
+
+    except Exception as e:
+        click.secho(f"\n✗ Error during backup process: {str(e)}", fg="red")
+        raise
