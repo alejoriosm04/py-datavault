@@ -160,22 +160,13 @@ El sistema incluye pruebas automatizadas para:
 - Gestión de errores robusta
 - Logs detallados de operaciones
 
-## 🤝 Contribución
-
-1. Fork del repositorio
-2. Crear rama feature (`git checkout -b feature/mejora`)
-3. Commit cambios (`git commit -am 'Agrega mejora'`)
-4. Push a la rama (`git push origin feature/mejora`)
-5. Crear Pull Request
-
 ## 📄 Licencia
 
-Este proyecto es parte del curso de Sistemas Operativos (ST0257) de EAFIT University.
+Este proyecto es parte del curso de Sistemas Operativos (ST0257) de la Universidada EAFIT.
 
 ## 👥 Autores
 
-- Nombre del Estudiante
-- Universidad EAFIT
-- Sistemas Operativos (ST0257)
-- 2024-1
-
+- Alejandro Ríos Muñoz
+- Lina Sofía Ballesteros Merchán
+- Juan Esteban García 
+- David Grisales Posada Galvis
