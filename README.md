@@ -1,6 +1,6 @@
 # Py-DataVault: Sistema de Backup Seguro con Dask
 
-Un sistema de respaldo seguro con compresión, encriptación, fragmentación USB y soporte en la nube. Proyecto para la asignatura "Sistemas Operativos" (ST0257) de EAFIT University.
+Un sistema de respaldo seguro con compresión, encriptación, fragmentación USB y soporte en la nube. Proyecto para la asignatura "Sistemas Operativos" (ST0257) de la Universidad EAFIT.
 
 ## 🎯 Características Principales
 
