@@ -168,5 +168,5 @@ Este proyecto es parte del curso de Sistemas Operativos (ST0257) de la Universid
 
 - Alejandro Ríos Muñoz
 - Lina Sofía Ballesteros Merchán
-- Juan Esteban García 
-- David Grisales Posada Galvis
+- Juan Esteban García Galvis
+- David Grisales Posada 
