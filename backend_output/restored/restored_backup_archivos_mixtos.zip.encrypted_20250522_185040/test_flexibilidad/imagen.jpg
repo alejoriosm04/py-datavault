@@ -1,0 +1,18 @@
+JFIF_HEADER_SIMULATION
+FF D8 FF E0 00 10 4A 46 49 46 00 01 01 01 00 48
+[Simulando datos binarios de una imagen JPEG]
+
+Esta es una simulación de un archivo de imagen .jpg
+para demostrar que el sistema de backup puede manejar
+archivos binarios de cualquier tipo.
+
+Los algoritmos de compresión funcionan con:
+- Archivos de texto (.txt, .md, .py, .js, etc.)
+- Documentos (.docx, .pdf, .xlsx)  
+- Imágenes (.jpg, .png, .gif, .bmp)
+- Videos (.mp4, .avi, .mkv)
+- Archivos (.zip, .rar, .7z)
+- Ejecutables (.exe, .msi)
+- Y cualquier tipo de archivo binario
+
+Datos binarios simulados: FF D8 FF E0... 

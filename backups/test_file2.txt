@@ -1,0 +1,16 @@
+Archivo de prueba #2 para el sistema de backup
+
+Este archivo contiene datos adicionales para probar:
+- Compresión con diferentes algoritmos (ZIP, GZIP, BZIP2)
+- Encriptación AES-256 
+- Paralelismo con Dask
+- Restauración completa
+
+Características implementadas:
+✓ Compresión clásica
+✓ Encriptación segura
+✓ Restauración robusta
+✓ Paralelismo
+✓ Gestión de errores
+
+Sistema desarrollado por tu equipo de trabajo. 

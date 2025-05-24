@@ -1,0 +1,13 @@
+Este es un archivo de prueba para el sistema de backup seguro.
+
+Contenido del archivo de prueba #1:
+- Este archivo será comprimido
+- Puede ser encriptado si se especifica
+- Será restaurado durante las pruebas
+
+Datos de prueba:
+Fecha: 2024-12-08
+Sistema: py-datavault
+Función: Backend de Backup y Restauración
+
+¡El sistema funciona correctamente! 
