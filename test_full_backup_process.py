@@ -2,6 +2,9 @@ import os
 import shutil
 import subprocess
 import click
+import time
+from storage.cloud import authenticate
+from storage.uploader import upload_backup
 
 def setup_test_environment():
     """Set up the test environment with necessary directories and test files."""
@@ -40,6 +43,33 @@ def cleanup_test_environment():
             shutil.rmtree(directory)
             os.makedirs(directory, exist_ok=True)
 
+def verify_cloud_upload(file_name):
+    """Verify if a file was uploaded to Google Drive."""
+    try:
+        print("Verificando subida a Google Drive...")
+        # Authenticate with Google Drive
+        drive = authenticate()
+        
+        # Search for the file in Google Drive
+        query = f"title contains '{file_name}'"
+        print(f"Buscando archivo con nombre: {file_name}")
+        file_list = drive.ListFile({'q': query}).GetList()
+        
+        # Check if the file exists
+        exists = len(file_list) > 0
+        if exists:
+            print(f"✓ Archivo '{file_name}' encontrado en Google Drive")
+        else:
+            print(f"✗ Archivo '{file_name}' no encontrado en Google Drive")
+        return exists
+    except Exception as e:
+        print(f"✗ Error verificando subida a la nube: {str(e)}")
+        print("  Asegúrese de que:")
+        print("  1. El directorio 'secrets/' existe")
+        print("  2. Tiene credenciales válidas en 'secrets/mycreds.txt'")
+        print("  3. Tiene conexión a internet")
+        return False
+
 def test_full_backup_process():
     """Run a complete test of the backup system."""
     try:
@@ -57,7 +87,8 @@ def test_full_backup_process():
             '--compression', 'zip',
             '--encrypt',
             '--password', 'test123',
-            '--usb-paths', 'usb1,usb2'
+            '--usb-paths', 'usb1,usb2',
+            '--cloud'  # Agregamos la opción de subida a la nube
         ]
         
         # Run the command and capture output
@@ -73,7 +104,7 @@ def test_full_backup_process():
         # Verify the results
         success = False
         
-        # Check if backup file was created (now checking in the correct directory)
+        # Check if backup file was created
         backup_exists = any(
             f.startswith('test_backup') 
             for f in os.listdir('backend_output/encrypted')
@@ -86,20 +117,26 @@ def test_full_backup_process():
         # Check if restored file exists
         restored_exists = len(os.listdir('restaured')) > 0
 
-        if backup_exists and usb1_has_fragments and restored_exists:
-            # Note: We only check usb1 because the logs show that with a small file,
-            # only one fragment is created and it goes to usb1
+        # Verify cloud upload
+        print("\nVerifying cloud upload...")
+        # Pequeña espera para asegurar que la subida se complete
+        time.sleep(5)
+        cloud_upload_success = verify_cloud_upload('test_backup')
+
+        if backup_exists and usb1_has_fragments and restored_exists and cloud_upload_success:
             success = True
             print("\n✅ Test completed successfully!")
             print("- Backup file created in backend_output/encrypted")
             print("- USB fragments created (1 fragment in usb1)")
             print("- File restored successfully")
+            print("- Cloud upload verified successfully")
         else:
             print("\n❌ Test failed!")
             print(f"- Backup file created in backend_output/encrypted: {'✅' if backup_exists else '❌'}")
             print(f"- USB1 fragments: {'✅' if usb1_has_fragments else '❌'}")
             print(f"- USB2 fragments: {'✅' if usb2_has_fragments else '❌'} (expected to be empty due to file size)")
             print(f"- Restored file: {'✅' if restored_exists else '❌'}")
+            print(f"- Cloud upload: {'✅' if cloud_upload_success else '❌'}")
 
         return success
 

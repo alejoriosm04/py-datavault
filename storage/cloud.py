@@ -3,19 +3,46 @@ from pydrive2.drive import GoogleDrive
 import os
 
 def authenticate():
-    gauth = GoogleAuth()
-
-    if 'oauth_flow_params' not in gauth.settings:
-        gauth.settings['oauth_flow_params'] = {}
-    gauth.settings['oauth_flow_params']['access_type'] = 'offline'
-    gauth.settings['oauth_flow_params']['approval_prompt'] = 'force'
-
-    gauth.LoadCredentialsFile("secrets/mycreds.txt")
-    if gauth.credentials is None:
-        gauth.LocalWebserverAuth()
-    elif gauth.access_token_expired:
-        gauth.Refresh()
-    else:
-        gauth.Authorize()
-    gauth.SaveCredentialsFile("secrets/mycreds.txt")
-    return GoogleDrive(gauth)
+    """
+    Authenticate with Google Drive ensuring offline access.
+    Returns a GoogleDrive instance if successful.
+    """
+    try:
+        # Initialize GoogleAuth
+        gauth = GoogleAuth()
+        
+        # Try to load saved client credentials
+        gauth.LoadCredentialsFile("secrets/mycreds.txt")
+        
+        if gauth.credentials is None:
+            # Authenticate if nothing stored
+            gauth.GetFlow()
+            gauth.flow.params.update({'access_type': 'offline'})
+            gauth.flow.params.update({'approval_prompt': 'force'})
+            
+            # Create local webserver and handle authentication
+            gauth.LocalWebserverAuth()
+            
+        elif gauth.access_token_expired:
+            # Refresh them if expired
+            try:
+                gauth.Refresh()
+            except Exception as e:
+                print(f"Error refreshing token: {str(e)}")
+                # If refresh fails, re-authenticate
+                gauth.GetFlow()
+                gauth.flow.params.update({'access_type': 'offline'})
+                gauth.flow.params.update({'approval_prompt': 'force'})
+                gauth.LocalWebserverAuth()
+        
+        # Save the current credentials
+        gauth.SaveCredentialsFile("secrets/mycreds.txt")
+        
+        return GoogleDrive(gauth)
+        
+    except Exception as e:
+        print(f"Authentication error: {str(e)}")
+        # Si hay un error, eliminamos las credenciales existentes y reintentamos
+        if os.path.exists("secrets/mycreds.txt"):
+            os.remove("secrets/mycreds.txt")
+        raise Exception("Error en la autenticación. Por favor, reintente el proceso.")
